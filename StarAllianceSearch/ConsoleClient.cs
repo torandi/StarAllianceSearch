@@ -24,6 +24,9 @@ namespace StarAllianceSearch
 		[Argument("In", ArgumentFlag.Required, Description = "The first day to start searching return trips from (format YYYY-MM-DD).")]
 		public DateTime InStart { get; set; }
 
+		[Argument("Pax", Description = "The number of seats to search for")]
+		public int Pax { get; set; } = 1;
+
 		[Argument("SearchSpan", Description = "Number of days to search in (each results in a new query).")]
 		public int DaysSearch { get; set; } = 7;
 
@@ -42,6 +45,9 @@ namespace StarAllianceSearch
 
 		[Argument("Config", ArgumentFlag.NoDefault, Description = "Config file to read options from. One option per line, format is argument=value. (Lines starting with # is ignored).")]
 		public string Config { get; set; } = "";
+
+		[Argument("HideErrors", Description = "Don't print error messages from flysas.com")]
+		public bool HideErrors { get; set; } = false;
 
 		[Argument("TranslateCodes", Description = "Write a table after all trips with translations for all codes.")]
 		public bool TranslateCodes { get; set; } = false;
@@ -249,7 +255,7 @@ namespace StarAllianceSearch
 		{
 			string dateFormat = "yyyy-MM-dd";
 
-			Console.Error.WriteLine("Searching for {0} to {1}", From, String.Join(", ", To));
+			Console.Error.WriteLine("Searching for {0} to {1} for {2} passengers.", From, String.Join(", ", To), Pax);
 			Console.Error.WriteLine("Searching for dates {0} - {1} (search range {2} days)"
 				, OutStart.ToString(dateFormat, CultureInfo.InvariantCulture)
 				, InStart.ToString(dateFormat, CultureInfo.InvariantCulture)
@@ -323,6 +329,7 @@ namespace StarAllianceSearch
 
 				sb.Clear();
 				sb.Append(flight.startTimeInLocal.ToString(dateFormat, CultureInfo.InvariantCulture)).Append(" -> ").Append(flight.endTimeInLocal.ToString(dateFormat, CultureInfo.InvariantCulture)).Append(" | ");
+
 				foreach (Segment segment in flight.segments)
 				{
 					sb.Append(segment.departureAirport.code).Append(" (").Append(segment.marketingCarrier.code);
@@ -337,7 +344,11 @@ namespace StarAllianceSearch
 					AddCode(segment.arrivalAirport);
 				}
 
-				sb.Append("TIME ").AppendFormat("{0:g}", timeDelta);
+				int availableSeats = flight.cabins.business[0].fares.Min(fare => fare.avlSeats);
+
+				sb.AppendFormat("TIME {0:g}", timeDelta);
+
+				sb.AppendFormat(" SEATS {0}", availableSeats);
 
 				txtOut.WriteLine(sb.ToString());
 			}
@@ -351,7 +362,8 @@ namespace StarAllianceSearch
 				InDate = InStart.AddDays(offsetDays),
 				OutDate = OutStart.AddDays(offsetDays),
 				From = From,
-				To = to
+				To = to,
+				Adt = Pax
 			};
 
 			SearchResult result = null;
@@ -361,11 +373,16 @@ namespace StarAllianceSearch
 			}
 			catch
 			{
-				Console.Error.WriteLine("Error in query");
+				Console.Error.WriteLine("Unexpected error in query.");
+				return new Result
+				{
+					OutBound = new List<FlightBaseClass>(),
+					InBound = new List<FlightBaseClass>()
+				};
 			}
 			if (result != null)
 			{
-				if (result.errors != null && result.errors.Any())
+				if (result.errors != null && result.errors.Any() && !HideErrors)
 				{
 					Console.Error.WriteLine("flysas.com says: " + result.errors.First().errorMessage);
 				}
