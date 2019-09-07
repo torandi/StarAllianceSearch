@@ -1,0 +1,3 @@
+[submodule "flysasClient"]
+	path = flysasClient
+	url = https://github.com/travelhacks/flysasClient
