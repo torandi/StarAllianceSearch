@@ -3,7 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StarAllianceSearch", "StarAllianceSearch\StarAllianceSearch.csproj", "{D9322866-18FF-4F19-B769-0A91B194E216}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StarAllianceSearch", "StarAllianceSearch\StarAllianceSearch.csproj", "{D9322866-18FF-4F19-B769-0A91B194E216}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5ED6610A-33B4-458E-9E05-6F0779BD5943} = {5ED6610A-33B4-458E-9E05-6F0779BD5943}
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlysasLib", "flysasClient\FlysasLib\FlysasLib.csproj", "{5ED6610A-33B4-458E-9E05-6F0779BD5943}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenFlightsData", "flysasClient\OpenFlightsData\OpenFlightsData.csproj", "{FCBD554B-E251-4768-AD1F-0051AE0FA0DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +22,14 @@ Global
 		{D9322866-18FF-4F19-B769-0A91B194E216}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9322866-18FF-4F19-B769-0A91B194E216}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9322866-18FF-4F19-B769-0A91B194E216}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5ED6610A-33B4-458E-9E05-6F0779BD5943}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5ED6610A-33B4-458E-9E05-6F0779BD5943}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5ED6610A-33B4-458E-9E05-6F0779BD5943}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5ED6610A-33B4-458E-9E05-6F0779BD5943}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FCBD554B-E251-4768-AD1F-0051AE0FA0DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FCBD554B-E251-4768-AD1F-0051AE0FA0DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FCBD554B-E251-4768-AD1F-0051AE0FA0DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FCBD554B-E251-4768-AD1F-0051AE0FA0DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
