@@ -21,8 +21,8 @@ namespace StarAllianceSearch
 		[Argument("Out",  ArgumentFlag.Required, Description = "The first day to start searching out trips from (format YYYY-MM-DD).")]
 		public DateTime OutStart { get; set; }
 
-		[Argument("In", ArgumentFlag.Required, Description = "The first day to start searching return trips from (format YYYY-MM-DD).")]
-		public DateTime InStart { get; set; }
+		[Argument("In", ArgumentFlag.NoDefault, Description = "The first day to start searching return trips from (format YYYY-MM-DD). Leave out to search in only one direction.")]
+		public DateTime? InStart { get; set; }
 
 		[Argument("Pax", Description = "The number of seats to search for")]
 		public int Pax { get; set; } = 1;
@@ -98,9 +98,14 @@ namespace StarAllianceSearch
 
 					Type type = property.PropertyType;
 
-					if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+					if (type.IsGenericType)
 					{
-						argument.Flags |= ArgumentFlag.List;
+						if (type.GetGenericTypeDefinition() == typeof(List<>))
+							argument.Flags |= ArgumentFlag.List;
+						else if (type.GetGenericTypeDefinition() == typeof(Nullable<>))
+							type = type.GetGenericArguments()[0];
+						else
+							throw new Exception(String.Format("Unhandled generic type {0}", type.FullName));
 					}
 
 					if (argument.Flags.HasFlag(ArgumentFlag.List))
@@ -255,10 +260,12 @@ namespace StarAllianceSearch
 		{
 			string dateFormat = "yyyy-MM-dd";
 
+			bool hasReturn = InStart.HasValue;
+
 			Console.Error.WriteLine("Searching for {0} to {1} for {2} passengers.", From, String.Join(", ", To), Pax);
 			Console.Error.WriteLine("Searching for dates {0} - {1} (search range {2} days)"
 				, OutStart.ToString(dateFormat, CultureInfo.InvariantCulture)
-				, InStart.ToString(dateFormat, CultureInfo.InvariantCulture)
+				, hasReturn ? InStart.Value.ToString(dateFormat, CultureInfo.InvariantCulture) : "(No Return)"
 				, DaysSearch);
 			foreach (var to in To)
 			{
@@ -359,12 +366,16 @@ namespace StarAllianceSearch
 			SASQuery query = new SASQuery
 			{
 				Mode = "STAR",
-				InDate = InStart.AddDays(offsetDays),
 				OutDate = OutStart.AddDays(offsetDays),
 				From = From,
 				To = to,
 				Adt = Pax
 			};
+
+			bool hasReturn = InStart.HasValue;
+
+			if (hasReturn)
+				query.InDate = InStart.Value.AddDays(offsetDays);
 
 			SearchResult result = null;
 			try
