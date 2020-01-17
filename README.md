@@ -25,6 +25,7 @@ Multiple destinations, some banned carriers
 _StarAllianceSearch -from ARN -to KIX,NRT -out 2019-12-01 -in 2020-01-12 -BannedCarriers CA,LO_
 
 All options:
+```
 -From            (required) Originating airport (code).
 -To              (required) Destination airport (code).
 -Out             (required) The first day to start searching out trips from (format YYYY-MM-DD).
@@ -38,3 +39,4 @@ All options:
 -HideErrors                 Don't print error messages from flysas.com
 -TranslateCodes             Write a table after all trips with translations for all codes.
 -Help                       Print this help message.
+```
